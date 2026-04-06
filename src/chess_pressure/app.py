@@ -96,7 +96,6 @@ def main():
     parser.add_argument(
         "--workers", "-w", type=int, default=2, help="Worker processes (default: 2)"
     )
-    parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
     args = parser.parse_args()
 
     uvicorn.run(
@@ -104,7 +103,6 @@ def main():
         host=args.host,
         port=args.port,
         workers=args.workers,
-        reload=args.reload,
     )
 
 
