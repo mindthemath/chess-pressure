@@ -1,4 +1,4 @@
-.PHONY: dev serve lint fmt help
+.PHONY: dev serve lint fmt build publish help
 
 # Development server with auto-reload
 dev:
@@ -17,6 +17,15 @@ fmt:
 	uvx ruff format src/chess_pressure/
 	uvx ruff check --fix src/chess_pressure/
 
+# Build sdist + wheel
+build:
+	rm -rf dist/
+	uv build
+
+# Publish to PyPI
+publish: build
+	uv publish
+
 help:
 	@echo "chess-pressure"
 	@echo ""
@@ -24,3 +33,5 @@ help:
 	@echo "  make serve   production server (:8888)"
 	@echo "  make lint    ruff format + check"
 	@echo "  make fmt     ruff format + auto-fix"
+	@echo "  make build   build sdist + wheel"
+	@echo "  make publish build + publish to PyPI"
