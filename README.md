@@ -22,18 +22,19 @@ For each square on the board, pressure is the net number of pieces attacking it.
 |------|------|-------|-------|
 | The Immortal Game | 1851 | Anderssen | Kieseritzky |
 | The Opera Game | 1858 | Morphy | Duke of Brunswick & Count Isouard |
-| Kasparov's Immortal | 1999 | Kasparov | Topalov |
 | Fischer vs Spassky, Game 6 | 1972 | Fischer | Spassky |
+| Shirov vs Polgar | 1994 | Shirov | Polgar |
 | Kasparov vs Deep Blue, Game 2 | 1997 | Deep Blue | Kasparov |
+| Kasparov's Immortal | 1999 | Kasparov | Topalov |
+| Polgar vs Anand | 1999 | Polgar | Anand |
+| Polgar vs Kasparov | 2002 | Polgar | Kasparov |
+| Hou Yifan vs Caruana | 2017 | Hou Yifan | Caruana |
+| Ju Wenjun vs Lei Tingjie, WCC G12 | 2023 | Ju Wenjun | Lei Tingjie |
 
 ## Quickstart
 
 ```bash
-# Install dependencies
-pip install fastapi uvicorn python-chess
-
-# Run the server
-python -m chess_pressure.app
+uv run chess-pressure
 ```
 
 The app starts on [http://localhost:8888](http://localhost:8888).
@@ -51,11 +52,12 @@ The app starts on [http://localhost:8888](http://localhost:8888).
 ## Project Structure
 
 ```
-chess_pressure/
+src/chess_pressure/
   __init__.py
   app.py       # FastAPI routes and static file serving
   engine.py    # Pressure computation, PGN parsing, move logic
   games.py     # Built-in famous games (PGN data)
+  static/      # Frontend assets (HTML, JS, CSS, piece images)
 ```
 
 ## License
