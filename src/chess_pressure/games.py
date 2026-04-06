@@ -34,28 +34,7 @@ Na6 21. Nxg7+ Kd8 22. Qf6+ Nxf6 23. Be7# 1-0""",
 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7
 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0""",
     },
-    {
-        "id": "kasparov-topalov",
-        "name": "Kasparov's Immortal (1999)",
-        "white": "Kasparov",
-        "black": "Topalov",
-        "pgn": """[Event "Hoogovens"]
-[Site "Wijk aan Zee"]
-[Date "1999.01.20"]
-[White "Garry Kasparov"]
-[Black "Veselin Topalov"]
-[Result "1-0"]
-
-1. e4 d6 2. d4 Nf6 3. Nc3 g6 4. Be3 Bg7 5. Qd2 c6 6. f3 b5 7. Nge2 Nbd7
-8. Bh6 Bxh6 9. Qxh6 Bb7 10. a3 e5 11. O-O-O Qe7 12. Kb1 a6 13. Nc1 O-O-O
-14. Nb3 exd4 15. Rxd4 c5 16. Rd1 Nb6 17. g3 Kb8 18. Na5 Ba8 19. Bh3 d5
-20. Qf4+ Ka7 21. Re1 d4 22. Nd5 Nbxd5 23. exd5 Qd6 24. Rxd4 cxd4 25. Re7+
-Kb6 26. Qxd4+ Kxa5 27. b4+ Ka4 28. Qc3 Qxd5 29. Ra7 Bb7 30. Rxb7 Qc4
-31. Qxf6 Kxa3 32. Qxa6+ Kxb4 33. c3+ Kxc3 34. Qa1+ Kd2 35. Qb2+ Kd1
-36. Bf1 Rd2 37. Rd7 Rxd7 38. Bxc4 bxc4 39. Qxh8 Rd3 40. Qa8 c3 41. Qa4+
-Ke1 42. f4 f5 43. Kc1 Rd2 44. Qa7 1-0""",
-    },
-    {
+{
         "id": "fischer-spassky-6",
         "name": "Fischer vs Spassky, Game 6 (1972)",
         "white": "Fischer",
@@ -176,22 +155,47 @@ c4 16.Bc3 Nc5 17.a5 Nb3 18.Bxf6 Nxa1 19.Bxa1 Qxa5 20.Qc3 Qxc3 21.Bxc3 Rcb8
 57.Ncb5 Re3 58.d6 Ke5 59.Nc6+ Ke4 60.d7 Rd3 61.Nd6+ Kf4 62.Rb8 1-0""",
     },
     {
-        "id": "shirov-polgar",
-        "name": "Shirov vs Polgar (1994)",
-        "white": "Shirov",
-        "black": "Polgar",
-        "pgn": """[Event "Buenos Aires Sicilian"]
-[Site "Buenos Aires"]
-[Date "1994.10.22"]
-[White "Alexei Shirov"]
-[Black "Judit Polgar"]
-[Result "0-1"]
+        "id": "xie-chiburdanidze",
+        "name": "Xie Jun vs Chiburdanidze, WCC (1991)",
+        "white": "Xie Jun",
+        "black": "Chiburdanidze",
+        "pgn": """[Event "Wch (Women)"]
+[Site "Manila"]
+[Date "1991.??.??"]
+[White "Xie Jun"]
+[Black "Maia Chiburdanidze"]
+[Result "1-0"]
 
-1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nc3 d6 6.g4 a6 7.Be3 Nge7 8.Nb3 b5
-9.f4 Bb7 10.Qf3 g5 11.fxg5 Ne5 12.Qg2 b4 13.Ne2 h5 14.gxh5 Nf5 15.Bf2 Qxg5
-16.Na5 Ne3 17.Qg3 Qxg3 18.Nxg3 Nxc2+ 19.Kd1 Nxa1 20.Nxb7 b3 21.axb3 Nxb3
-22.Kc2 Nc5 23.Nxc5 dxc5 24.Be1 Nf3 25.Bc3 Nd4+ 26.Kd3 Bd6 27.Bg2 Be5 28.Kc4
-Ke7 29.Ra1 Nc6 0-1""",
+1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O
+9.h3 Nd7 10.d4 Bf6 11.a4 Bb7 12.axb5 axb5 13.Rxa8 Qxa8 14.d5 Ne7 15.Na3 c6
+16.dxc6 Bxc6 17.Qxd6 Nc8 18.Qd1 Nc5 19.Bd5 Nxe4 20.Bxc6 Qxc6 21.Qd3 Ncd6
+22.Nxb5 Qc5 23.Qe2 Ng3 24.Qe3 Qxb5 25.fxg3 e4 26.Nd4 Qb7 27.Nc2 Re8 28.Qc5
+Be5 29.g4 Qe7 30.Be3 h5 31.gxh5 Qh4 32.Bd4 Bxd4+ 33.Qxd4 Re6 34.Qd1 Nc4
+35.b3 Ne5 36.Qe2 Rf6 37.Rf1 Rxf1+ 38.Kxf1 Nd3 39.Nd4 Qf4+ 40.Kg1 Qc1+
+41.Kh2 Nc5 42.Qc2 Qf4+ 43.g3 Qg5 44.b4 Nd3 45.Qe2 f5 46.h4 Qf6 47.Qa2+ Kh7
+48.Qe6 Qxe6 49.Nxe6 e3 50.Nd4 f4 51.b5 1-0""",
+    },
+    {
+        "id": "carlsen-nakamura",
+        "name": "Carlsen vs Nakamura (2010)",
+        "white": "Carlsen",
+        "black": "Nakamura",
+        "pgn": """[Event "London Chess Classic"]
+[Site "London"]
+[Date "2010.12.11"]
+[White "Magnus Carlsen"]
+[Black "Hikaru Nakamura"]
+[Result "1-0"]
+
+1.c4 f5 2.g3 Nf6 3.Bg2 d6 4.Nc3 g6 5.e3 Bg7 6.Nge2 O-O 7.O-O e5 8.b3 Nbd7
+9.d3 c6 10.Ba3 Qc7 11.Qd2 Re8 12.Rae1 Nc5 13.h3 e4 14.dxe4 Nfxe4 15.Qc2 Nxc3
+16.Nxc3 Be6 17.Rd1 Rad8 18.Bb2 Bf7 19.Rd2 a5 20.Rfd1 Be5 21.Ne2 a4 22.b4 Nd7
+23.Bd4 Nb6 24.Bxb6 Qxb6 25.Rb1 Qc7 26.Nd4 Rc8 27.Rc1 Qe7 28.Rd3 c5 29.bxc5
+Rxc5 30.Qxa4 Rec8 31.Rb1 Rxc4 32.Qd1 b6 33.Nb5 R4c5 34.Nxd6 Bxd6 35.Rxd6
+Bxa2 36.Ra1 Rc1 37.Rxc1 Rxc1 38.Rxg6+ hxg6 39.Qxc1 Qd6 40.h4 Bf7 41.h5 Kh7
+42.hxg6+ Kxg6 43.Qc2 b5 44.g4 Qe5 45.gxf5+ Kg7 46.Qe4 Qd6 47.Qh4 Bc4 48.Bf3
+Qf6 49.Qxf6+ Kxf6 50.Be4 Ba2 51.f4 b4 52.Kf2 b3 53.Bd5 Kxf5 54.Kf3 Kf6 55.e4
+Kg6 56.Ke3 Kh5 57.Kd4 Kg4 58.f5 Kg5 59.Ke5 1-0""",
     },
 ]
 

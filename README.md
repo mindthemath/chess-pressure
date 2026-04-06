@@ -23,11 +23,11 @@ For each square on the board, pressure is the net number of pieces attacking it.
 | The Immortal Game | 1851 | Anderssen | Kieseritzky |
 | The Opera Game | 1858 | Morphy | Duke of Brunswick & Count Isouard |
 | Fischer vs Spassky, Game 6 | 1972 | Fischer | Spassky |
-| Shirov vs Polgar | 1994 | Shirov | Polgar |
+| Xie Jun vs Chiburdanidze, WCC | 1991 | Xie Jun | Chiburdanidze |
 | Kasparov vs Deep Blue, Game 2 | 1997 | Deep Blue | Kasparov |
-| Kasparov's Immortal | 1999 | Kasparov | Topalov |
 | Polgar vs Anand | 1999 | Polgar | Anand |
 | Polgar vs Kasparov | 2002 | Polgar | Kasparov |
+| Carlsen vs Nakamura | 2010 | Carlsen | Nakamura |
 | Hou Yifan vs Caruana | 2017 | Hou Yifan | Caruana |
 | Ju Wenjun vs Lei Tingjie, WCC G12 | 2023 | Ju Wenjun | Lei Tingjie |
 
