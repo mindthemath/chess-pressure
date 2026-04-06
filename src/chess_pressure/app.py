@@ -31,6 +31,17 @@ class MoveRequest(BaseModel):
     uci: str
 
 
+# --- Health ---
+
+
+@app.get("/health", include_in_schema=False)
+@app.get("/up", include_in_schema=False)
+@app.get("/status", include_in_schema=False)
+@app.get("/health-check", include_in_schema=False)
+def health():
+    return {"status": "ok"}
+
+
 # --- API ---
 
 
