@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 import uvicorn
@@ -39,6 +40,7 @@ def list_games():
 
 
 @app.get("/api/games/{game_id}")
+@lru_cache(maxsize=16)
 def load_game(game_id: str):
     pgn = get_game_pgn(game_id)
     if pgn is None:
