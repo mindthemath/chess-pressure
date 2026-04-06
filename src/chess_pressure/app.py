@@ -20,6 +20,7 @@ app = FastAPI(title="Chess Pressure", docs_url=None, redoc_url=None)
 
 # --- Models ---
 
+
 class PGNUpload(BaseModel):
     pgn: str
 
@@ -30,6 +31,7 @@ class MoveRequest(BaseModel):
 
 
 # --- API ---
+
 
 @app.get("/api/games")
 def list_games():
@@ -55,6 +57,7 @@ def parse_uploaded_pgn(body: PGNUpload):
 @app.get("/api/legal")
 def legal_moves(fen: str):
     import chess
+
     board = chess.Board(fen)
     return [m.uci() for m in board.legal_moves]
 
@@ -81,7 +84,28 @@ def index():
 
 
 def main():
-    uvicorn.run("chess_pressure.app:app", host="0.0.0.0", port=8888, workers=2)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Chess Pressure server")
+    parser.add_argument(
+        "--host", default="0.0.0.0", help="Bind address (default: 0.0.0.0)"
+    )
+    parser.add_argument(
+        "--port", "-p", type=int, default=8888, help="Port (default: 8888)"
+    )
+    parser.add_argument(
+        "--workers", "-w", type=int, default=2, help="Worker processes (default: 2)"
+    )
+    parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
+    args = parser.parse_args()
+
+    uvicorn.run(
+        "chess_pressure.app:app",
+        host=args.host,
+        port=args.port,
+        workers=args.workers,
+        reload=args.reload,
+    )
 
 
 if __name__ == "__main__":

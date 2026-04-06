@@ -198,7 +198,10 @@ Ke7 29.Ra1 Nc6 0-1""",
 
 def get_game_list() -> list[dict]:
     """Return list of available games (id, name, white, black)."""
-    return [{"id": g["id"], "name": g["name"], "white": g["white"], "black": g["black"]} for g in GAMES]
+    return [
+        {"id": g["id"], "name": g["name"], "white": g["white"], "black": g["black"]}
+        for g in GAMES
+    ]
 
 
 def get_game_pgn(game_id: str) -> str | None:

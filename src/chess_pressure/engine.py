@@ -64,26 +64,32 @@ def parse_pgn(pgn_text: str) -> dict:
     frames = []
 
     # Frame 0: starting position
-    frames.append({
-        "board": board_to_dict(board),
-        "pressure": compute_pressure(board, weighted=False),
-        "pressure_weighted": compute_pressure(board, weighted=True),
-    })
+    frames.append(
+        {
+            "board": board_to_dict(board),
+            "pressure": compute_pressure(board, weighted=False),
+            "pressure_weighted": compute_pressure(board, weighted=True),
+        }
+    )
 
     for node in game.mainline():
         move = node.move
         san = board.san(move)
         board.push(move)
-        moves.append({
-            "san": san,
-            "uci": move.uci(),
-            "ply": board.ply(),
-        })
-        frames.append({
-            "board": board_to_dict(board),
-            "pressure": compute_pressure(board, weighted=False),
-            "pressure_weighted": compute_pressure(board, weighted=True),
-        })
+        moves.append(
+            {
+                "san": san,
+                "uci": move.uci(),
+                "ply": board.ply(),
+            }
+        )
+        frames.append(
+            {
+                "board": board_to_dict(board),
+                "pressure": compute_pressure(board, weighted=False),
+                "pressure_weighted": compute_pressure(board, weighted=True),
+            }
+        )
 
     return {
         "headers": headers,
