@@ -9,3 +9,6 @@ dependencies = [
     "uvicorn",
     "python-chess",
 ]
+
+[project.scripts]
+chess-pressure = "chess_pressure.app:main"
