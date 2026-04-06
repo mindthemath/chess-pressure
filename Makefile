@@ -1,4 +1,4 @@
-.PHONY: dev serve lint fmt build publish help
+.PHONY: dev serve lint fmt build publish deploy logs status help
 
 # Development server with auto-reload
 dev:
@@ -26,6 +26,18 @@ build:
 publish: build
 	uv publish
 
+# Deploy to Fly.io
+deploy:
+	fly deploy -a chess-pressure
+
+# Tail production logs
+logs:
+	fly logs -a chess-pressure
+
+# Production status
+status:
+	fly status -a chess-pressure
+
 help:
 	@echo "chess-pressure"
 	@echo ""
@@ -35,3 +47,6 @@ help:
 	@echo "  make fmt     ruff format + auto-fix"
 	@echo "  make build   build sdist + wheel"
 	@echo "  make publish build + publish to PyPI"
+	@echo "  make deploy  deploy to Fly.io"
+	@echo "  make logs    tail production logs"
+	@echo "  make status  Fly.io app status"
