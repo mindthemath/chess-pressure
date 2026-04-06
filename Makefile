@@ -10,12 +10,12 @@ serve:
 
 # Lint
 lint: fmt
-	uvx ruff check chess_pressure/
+	uvx ruff check src/chess_pressure/
 
 # Format
 fmt:
-	uvx ruff format chess_pressure/
-	uvx ruff check --fix chess_pressure/
+	uvx ruff format src/chess_pressure/
+	uvx ruff check --fix src/chess_pressure/
 
 help:
 	@echo "chess-pressure"

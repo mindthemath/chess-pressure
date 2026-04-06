@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from .engine import make_move, parse_pgn
 from .games import get_game_list, get_game_pgn
 
-STATIC = Path(__file__).resolve().parent.parent / "static"
+STATIC = Path(__file__).resolve().parent / "static"
 
 app = FastAPI(title="Chess Pressure", docs_url=None, redoc_url=None)
 
