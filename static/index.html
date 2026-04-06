@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Pressure</title>
+  <link rel="stylesheet" href="/static/style.css?v=21">
+  <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+</head>
+<body>
+  <header>
+    <h1>Chess Pressure</h1>
+    <div class="header-controls">
+      <button id="theme-toggle" title="Toggle dark/light mode">
+        <span class="icon-sun">&#9788;</span>
+        <span class="icon-moon">&#9790;</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="board-panel">
+      <div class="board-wrap">
+        <div id="board"></div>
+      </div>
+      <div class="playback">
+        <input type="range" id="slider" min="0" max="0" value="0">
+        <div class="playback-buttons">
+          <button id="btn-start" title="Start">&#9198;</button>
+          <button id="btn-prev" title="Back">&#9664;</button>
+          <button id="btn-play" title="Play/Pause">&#9654;</button>
+          <button id="btn-next" title="Forward">&#9654;</button>
+          <button id="btn-end" title="End">&#9197;</button>
+        </div>
+        <div class="pressure-mode">
+          <label><input type="radio" name="pmode" value="equal" checked> Equal weight</label>
+          <label><input type="radio" name="pmode" value="weighted"> Piece value</label>
+          <label><input type="checkbox" id="toggle-pieces" checked> Pieces</label>
+          <label><input type="checkbox" id="toggle-board"> Board</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="game-selector">
+        <select id="game-select">
+          <option value="__new">New game</option>
+        </select>
+        <button id="btn-upload" title="Upload PGN">PGN</button>
+      </div>
+
+      <div class="game-info" id="game-info"></div>
+
+      <div class="move-list" id="move-list"></div>
+
+      <div class="fork-controls" id="fork-controls" style="display:none">
+        <span class="fork-badge">Forked at move <span id="fork-point"></span></span>
+        <button id="btn-reset-fork">Reset to original</button>
+      </div>
+
+      <div class="export-row">
+        <button id="btn-export">Export GIF</button>
+      </div>
+
+      <div class="status-bar" id="status-bar"></div>
+    </div>
+  </main>
+
+  <dialog id="export-dialog">
+    <form method="dialog">
+      <h2>Export GIF</h2>
+      <label>Speed per move:
+        <select id="export-speed">
+          <option value="250">0.25s (fast)</option>
+          <option value="500" selected>0.5s</option>
+          <option value="1000">1s</option>
+          <option value="2000">2s (slow)</option>
+        </select>
+      </label>
+      <p class="export-info">480 &times; 480px &mdash; respects current view settings</p>
+      <div class="export-progress" id="export-progress" style="display:none">
+        <progress id="export-bar" max="100" value="0"></progress>
+        <span id="export-pct">0%</span>
+      </div>
+      <div class="dialog-buttons">
+        <button type="button" id="export-go">Export</button>
+        <button type="button" id="export-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="pgn-dialog">
+    <form method="dialog">
+      <h2>Upload PGN</h2>
+      <textarea id="pgn-input" rows="12" placeholder="Paste PGN here..."></textarea>
+      <div class="dialog-buttons">
+        <button type="button" id="pgn-file-btn">Choose file</button>
+        <input type="file" id="pgn-file" accept=".pgn,.txt" style="display:none">
+        <button type="submit" id="pgn-submit">Load</button>
+        <button type="button" id="pgn-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="/static/gif.js"></script>
+  <script src="/static/app.js?v=21"></script>
+</body>
+</html>
