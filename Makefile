@@ -1,4 +1,4 @@
-.PHONY: dev serve lint fmt build publish deploy logs status help
+.PHONY: dev serve lint fmt build publish fly-install deploy logs status help
 
 # Development server with auto-reload
 dev:
@@ -26,6 +26,10 @@ build:
 publish: build
 	uv publish
 
+# Install flyctl
+fly-install:
+	curl -L https://fly.io/install.sh | sh
+
 # Deploy to Fly.io
 deploy:
 	fly deploy -a chess-pressure
@@ -46,7 +50,8 @@ help:
 	@echo "  make lint    ruff format + check"
 	@echo "  make fmt     ruff format + auto-fix"
 	@echo "  make build   build sdist + wheel"
-	@echo "  make publish build + publish to PyPI"
-	@echo "  make deploy  deploy to Fly.io"
+	@echo "  make publish     build + publish to PyPI"
+	@echo "  make fly-install install flyctl"
+	@echo "  make deploy      deploy to Fly.io"
 	@echo "  make logs    tail production logs"
 	@echo "  make status  Fly.io app status"
