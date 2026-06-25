@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/style.css?v=25">
+  <link rel="stylesheet" href="/style.css?v=26">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
   <header>
@@ -124,11 +125,20 @@
     <a href="https://github.com/mindthemath/chess-pressure">source</a>
   </footer>
 
+  <!-- PWA flag — flipped to true at build time by ENABLE_CHESS_PWA=1 (off by default). -->
+  <script>window.CHESS_PWA = false;</script>
+  <script>
+    if (window.CHESS_PWA && "serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js").catch(function () {});
+      });
+    }
+  </script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
   <script src="/chess.min.js"></script>
   <script src="/gif.js"></script>
   <script src="/engine.js"></script>
-  <script src="/app.js?v=25"></script>
+  <script src="/app.js?v=26"></script>
 </body>
 </html>

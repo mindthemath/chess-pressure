@@ -1,4 +1,4 @@
-.PHONY: dev serve games parity lint fmt build publish fly-install deploy logs status help
+.PHONY: dev serve games parity bump lint fmt build publish fly-install deploy logs status help
 
 # Static dev server (client-side app; refresh picks up edits)
 dev:
@@ -17,6 +17,11 @@ parity:
 	cd parity && bun install --silent
 	uv run python parity/dump_python.py > parity/.py_frames.json
 	cd parity && bun run check.js
+
+# Bump static asset cache-bust version (index.html + sw.js). Run before deploy
+# when any cached asset changed — required for the PWA service worker to update.
+bump:
+	./scripts/bump_version.sh
 
 # Lint
 lint: fmt
@@ -59,6 +64,7 @@ help:
 	@echo "  make serve   optional Python fallback server (:8888)"
 	@echo "  make games   regenerate static/games.json from games.py"
 	@echo "  make parity  verify JS engine matches python-chess"
+	@echo "  make bump    bump asset cache version (run before deploy)"
 	@echo "  make lint    ruff format + check"
 	@echo "  make fmt     ruff format + auto-fix"
 	@echo "  make build   build sdist + wheel"

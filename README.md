@@ -59,6 +59,7 @@ Other useful targets:
 make serve      # optional Python fallback server (also serves the static app)
 make games      # regenerate static/games.json after editing games.py
 make parity     # verify the JS engine matches python-chess
+make bump       # bump the asset cache version (run before deploy — see below)
 make deploy     # deploy the static image to Fly.io
 ```
 
@@ -68,6 +69,38 @@ Production is a ~9 MB image built on
 [static-web-server](https://static-web-server.net/) (see `Dockerfile`) — it serves
 `static/` and nothing else, so it boots fast and scales to zero cleanly. The only
 cold-start cost is the initial page load; all gameplay afterwards is local.
+
+### Cache versioning (run before every deploy)
+
+Static assets are cache-busted by a single version number that appears in two
+places: `index.html` (`style.css?v=N`, `app.js?v=N`) and `sw.js`
+(`CACHE = "chess-pressure-vN"`). **Whenever you change a cached asset, bump it:**
+
+```bash
+make bump        # v25 -> v26 across index.html and sw.js, kept in sync
+```
+
+This matters for the normal browser cache, and is **critical when the PWA is
+enabled** — the service worker will otherwise keep serving the old assets to
+returning visitors forever. Forgetting `make bump` is the #1 "why am I seeing old
+code?" cause. Commit the bump along with your asset change, then `make deploy`.
+
+### Offline / PWA (opt-in, off by default)
+
+The app can install a service worker (`sw.js` + `manifest.json`) that caches the
+whole app shell, so **repeat visits load instantly and work fully offline**. It is
+**disabled by default on purpose**: an active service worker serves returning
+visitors entirely from cache, so they no longer hit the server and won't appear in
+the Fly logs. Enable it at build time:
+
+```bash
+docker build --build-arg ENABLE_CHESS_PWA=1 .
+fly deploy --build-arg ENABLE_CHESS_PWA=1        # to ship it on Fly
+ENABLE_CHESS_PWA=1 make dev                       # to test it locally
+```
+
+The flag flips `window.CHESS_PWA` in `index.html`; when false, the service worker
+is never registered. Remember to `make bump` on every deploy once it's on.
 
 ## API (optional Python server)
 
@@ -93,10 +126,13 @@ src/chess_pressure/
     engine.js       # Browser port of engine.py (chess.js)
     chess.min.js    # Vendored chess.js 1.4.0 (bundled global)
     games.json      # Built-in games, generated from games.py
+    sw.js           # Service worker (opt-in PWA/offline cache)
+    manifest.json   # PWA manifest
     app.js, ...     # Frontend (HTML, JS, CSS, piece images)
 scripts/export_games.py   # games.py -> static/games.json
+scripts/bump_version.sh   # bump the asset cache version (make bump)
 parity/                   # JS-vs-python engine parity test
-dev-server.js             # bun static dev server
+dev-server.js             # bun static dev server (ENABLE_CHESS_PWA=1 to test PWA)
 ```
 
 ## License

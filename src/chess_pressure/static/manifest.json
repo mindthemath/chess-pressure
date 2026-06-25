@@ -1,0 +1,13 @@
+{
+  "name": "Chess Pressure",
+  "short_name": "Pressure",
+  "description": "Visualize which squares white and black control across a chess game.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    { "src": "/img/chesspieces/wikipedia/wN.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/chesspieces/wikipedia/wN.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
