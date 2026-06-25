@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/static/style.css?v=21">
+  <link rel="stylesheet" href="/static/style.css?v=22">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
 </head>
 <body>
@@ -26,17 +26,31 @@
       <div class="playback">
         <input type="range" id="slider" min="0" max="0" value="0">
         <div class="playback-buttons">
-          <button id="btn-start" title="Start">&#9198;</button>
-          <button id="btn-prev" title="Back">&#9664;</button>
-          <button id="btn-play" title="Play/Pause">&#9654;</button>
-          <button id="btn-next" title="Forward">&#9654;</button>
-          <button id="btn-end" title="End">&#9197;</button>
+          <button id="btn-start" title="Start"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="2" width="2" height="12"/><polygon points="14,2 6,8 14,14"/></svg></button>
+          <button id="btn-prev" title="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="13,2 3,8 13,14"/></svg></button>
+          <button id="btn-play" title="Play/Pause"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="3,2 13,8 3,14"/></svg></button>
+          <button id="btn-next" title="Forward"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="3,2 13,8 3,14"/></svg></button>
+          <button id="btn-end" title="End"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="2,2 10,8 2,14"/><rect x="13" y="2" width="2" height="12"/></svg></button>
         </div>
         <div class="pressure-mode">
-          <label><input type="radio" name="pmode" value="equal" checked> Equal weight</label>
-          <label><input type="radio" name="pmode" value="weighted"> Piece value</label>
-          <label><input type="checkbox" id="toggle-pieces" checked> Pieces</label>
-          <label><input type="checkbox" id="toggle-board"> Board</label>
+          <div class="pmode-toggle">
+            <label class="pmode-opt">
+              <input type="radio" name="pmode" value="equal" checked>
+              <span>Equal</span>
+            </label>
+            <label class="pmode-opt">
+              <input type="radio" name="pmode" value="weighted">
+              <span>Piece value</span>
+            </label>
+          </div>
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-pieces" checked>
+            <span>Pieces</span>
+          </label>
+          <label class="toggle-row">
+            <input type="checkbox" id="toggle-board">
+            <span>Board</span>
+          </label>
         </div>
       </div>
     </div>
@@ -110,6 +124,6 @@
   <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script src="/static/gif.js"></script>
-  <script src="/static/app.js?v=21"></script>
+  <script src="/static/app.js?v=22"></script>
 </body>
 </html>

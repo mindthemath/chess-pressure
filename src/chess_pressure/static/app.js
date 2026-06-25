@@ -263,9 +263,12 @@
   }
 
   // --- Playback ---
+  const ICON_PLAY = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="3,2 13,8 3,14"/></svg>';
+  const ICON_PAUSE = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>';
+
   function togglePlay() {
     playing = !playing;
-    document.getElementById("btn-play").innerHTML = playing ? "&#9646;&#9646;" : "&#9654;";
+    document.getElementById("btn-play").innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
     if (playing) {
       playTimer = setInterval(() => {
         if (currentIndex >= gameData.frames.length - 1) {
