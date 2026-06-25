@@ -48,3 +48,10 @@ htmlcov/
 
 # mypy
 .mypy_cache/
+
+# Node / parity test
+node_modules/
+parity/.py_frames.json
+parity/.dumperr
+bun.lock
+bun.lockb

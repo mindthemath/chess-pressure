@@ -1,15 +1,13 @@
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+# Fully client-side app — production is just static files served by a tiny,
+# fast-booting static-web-server (Rust). No Python in the runtime image.
+FROM ghcr.io/static-web-server/static-web-server:2
 
-WORKDIR /app
-COPY pyproject.toml uv.lock README.md ./
-COPY src/ src/
-RUN uv sync --no-dev --locked --no-editable
+COPY src/chess_pressure/static/ /public/
 
-FROM python:3.13-slim-bookworm
-
-WORKDIR /app
-COPY --from=builder /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
+ENV SERVER_HOST=0.0.0.0 \
+    SERVER_PORT=8888 \
+    SERVER_ROOT=/public \
+    SERVER_FALLBACK_PAGE=/public/index.html \
+    SERVER_COMPRESSION=true
 
 EXPOSE 8888
-CMD ["chess-pressure"]

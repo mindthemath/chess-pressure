@@ -116,60 +116,46 @@
       return;
     }
 
-    // Fetch legal moves for this square
-    fetch("/api/move", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fen, uci: square + square }), // dummy — we just need to check if piece exists
-    }).catch(() => {});
-
-    // Check if there's a piece here by seeing if any legal move starts from this square
-    // We need to ask the server for legal moves from this position
-    fetch(`/api/legal?fen=${encodeURIComponent(fen)}`).then(r => r.ok ? r.json() : null).then(data => {
-      if (!data) return;
-      const fromMoves = data.filter((m) => m.startsWith(square));
-      if (fromMoves.length === 0) {
-        clearSelection();
-        return;
-      }
+    // Legal moves originating from this square (computed locally)
+    const fromMoves = ChessPressure.legalMoves(fen).filter((m) => m.startsWith(square));
+    if (fromMoves.length === 0) {
       clearSelection();
-      selectedSquare = square;
-      legalMoves = fromMoves;
+      return;
+    }
+    clearSelection();
+    selectedSquare = square;
+    legalMoves = fromMoves;
 
-      // Highlight
-      const srcEl = document.querySelector(`[data-square="${square}"]`);
-      if (srcEl) srcEl.classList.add("square-selected");
-      fromMoves.forEach((m) => {
-        const target = m.substring(2, 4);
-        const el = document.querySelector(`[data-square="${target}"]`);
-        if (el) el.classList.add("square-target");
-      });
+    // Highlight
+    const srcEl = document.querySelector(`[data-square="${square}"]`);
+    if (srcEl) srcEl.classList.add("square-selected");
+    fromMoves.forEach((m) => {
+      const target = m.substring(2, 4);
+      const el = document.querySelector(`[data-square="${target}"]`);
+      if (el) el.classList.add("square-target");
     });
   }
 
   function doMove(fen, uci) {
-    fetch("/api/move", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fen, uci }),
-    })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (!data) return;
-        // First divergence from the originally-loaded line: snapshot it so "Reset to original" works.
-        if (forkPoint === null && currentIndex < gameData.frames.length - 1) {
-          originalData = JSON.parse(JSON.stringify(gameData));
-          forkPoint = currentIndex;
-        }
-        // Always overwrite any continuation past the current point, so rewinding and
-        // playing a different move replaces the old line instead of appending to it.
-        gameData.moves = gameData.moves.slice(0, currentIndex);
-        gameData.frames = gameData.frames.slice(0, currentIndex + 1);
-        gameData.moves.push({ san: data.san, uci: data.uci, ply: currentIndex + 1 });
-        gameData.frames.push(data.frame);
-        goTo(gameData.frames.length - 1);
-        updateForkUI();
-      });
+    let data;
+    try {
+      data = ChessPressure.makeMove(fen, uci); // computed locally — no server round-trip
+    } catch (e) {
+      return; // illegal move — ignore
+    }
+    // First divergence from the originally-loaded line: snapshot it so "Reset to original" works.
+    if (forkPoint === null && currentIndex < gameData.frames.length - 1) {
+      originalData = JSON.parse(JSON.stringify(gameData));
+      forkPoint = currentIndex;
+    }
+    // Always overwrite any continuation past the current point, so rewinding and
+    // playing a different move replaces the old line instead of appending to it.
+    gameData.moves = gameData.moves.slice(0, currentIndex);
+    gameData.frames = gameData.frames.slice(0, currentIndex + 1);
+    gameData.moves.push({ san: data.san, uci: data.uci, ply: currentIndex + 1 });
+    gameData.frames.push(data.frame);
+    goTo(gameData.frames.length - 1);
+    updateForkUI();
   }
 
   // --- Move list ---
@@ -322,37 +308,158 @@
     updateForkUI();
   }
 
-  // --- Load game ---
-  async function loadGame(gameId) {
-    const r = await fetch(`/api/games/${gameId}`);
-    if (!r.ok) return;
-    gameData = await r.json();
-    forkPoint = null;
-    originalData = null;
-    currentIndex = 0;
-    goTo(0);
-    updateGameInfo();
-    updateForkUI();
+  // --- Game sources (built-in + browser-saved) ---
+  let BUILTIN_GAMES = [];
+  const SAVED_KEY = "cp.games";
+  let currentSavedId = null;
+
+  function getSavedGames() {
+    try {
+      return JSON.parse(localStorage.getItem(SAVED_KEY)) || [];
+    } catch (e) {
+      return [];
+    }
   }
 
-  async function loadPGN(pgn) {
-    const r = await fetch("/api/parse", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pgn }),
-    });
-    if (!r.ok) {
-      alert("Failed to parse PGN");
-      return;
-    }
-    gameData = await r.json();
+  function setSavedGames(list) {
+    localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+  }
+
+  function applyParsed(parsed, savedId) {
+    gameData = parsed;
     forkPoint = null;
     originalData = null;
+    currentSavedId = savedId || null;
     currentIndex = 0;
     goTo(0);
     updateGameInfo();
     updateForkUI();
+    updateSavedControls();
+  }
+
+  // --- Load game ---
+  function loadGame(gameId) {
+    const g = BUILTIN_GAMES.find((x) => x.id === gameId);
+    if (!g) return;
+    applyParsed(ChessPressure.parsePgn(g.pgn), null);
+  }
+
+  function loadSaved(savedId) {
+    const g = getSavedGames().find((x) => x.id === savedId);
+    if (!g) return;
+    let parsed;
+    try {
+      parsed = ChessPressure.parsePgn(g.pgn);
+    } catch (e) {
+      alert("That saved game could not be loaded (corrupted PGN).");
+      return;
+    }
+    applyParsed(parsed, savedId);
+  }
+
+  function loadPGN(pgn) {
+    let parsed;
+    try {
+      parsed = ChessPressure.parsePgn(pgn);
+    } catch (e) {
+      alert("Could not parse PGN — please check the format and try again.");
+      return;
+    }
+    applyParsed(parsed, null);
     document.getElementById("game-select").value = "";
+  }
+
+  // --- Saved games (localStorage) + PGN export ---
+  function populateGameSelect() {
+    const select = document.getElementById("game-select");
+    const prev = select.value;
+    select.innerHTML = '<option value="__new">New game</option>';
+
+    if (BUILTIN_GAMES.length) {
+      const og = document.createElement("optgroup");
+      og.label = "Famous games";
+      BUILTIN_GAMES.forEach((g) => {
+        const opt = document.createElement("option");
+        opt.value = g.id;
+        opt.textContent = g.name;
+        og.appendChild(opt);
+      });
+      select.appendChild(og);
+    }
+
+    const saved = getSavedGames();
+    if (saved.length) {
+      const og = document.createElement("optgroup");
+      og.label = "Saved games";
+      saved.forEach((g) => {
+        const opt = document.createElement("option");
+        opt.value = "saved:" + g.id;
+        opt.textContent = g.name;
+        og.appendChild(opt);
+      });
+      select.appendChild(og);
+    }
+
+    // Restore selection if it still exists
+    if (prev && [...select.options].some((o) => o.value === prev)) {
+      select.value = prev;
+    }
+  }
+
+  function updateSavedControls() {
+    const del = document.getElementById("btn-delete-saved");
+    if (del) del.style.display = currentSavedId ? "" : "none";
+    const select = document.getElementById("game-select");
+    if (currentSavedId) select.value = "saved:" + currentSavedId;
+  }
+
+  function defaultGameName() {
+    const h = (gameData && gameData.headers) || {};
+    if (h.White && h.Black) return `${h.White} vs ${h.Black}`;
+    return "My game";
+  }
+
+  function saveCurrentGame() {
+    if (!gameData) return;
+    const name = (prompt("Save game as:", defaultGameName()) || "").trim();
+    if (!name) return;
+    const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
+    const saved = getSavedGames();
+    const id = "g" + Date.now().toString(36);
+    saved.push({ id, name, pgn, savedAt: new Date().toISOString() });
+    setSavedGames(saved);
+    currentSavedId = id;
+    populateGameSelect();
+    updateSavedControls();
+  }
+
+  function deleteSavedGame() {
+    if (!currentSavedId) return;
+    const saved = getSavedGames();
+    const g = saved.find((x) => x.id === currentSavedId);
+    if (!g) return;
+    if (!confirm(`Delete saved game "${g.name}"?`)) return;
+    setSavedGames(saved.filter((x) => x.id !== currentSavedId));
+    currentSavedId = null;
+    populateGameSelect();
+    updateSavedControls();
+  }
+
+  function exportPGN() {
+    if (!gameData) return;
+    const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
+    const slug = (defaultGameName() || "game")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "game";
+    const blob = new Blob([pgn], { type: "application/x-chess-pgn" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = slug + ".pgn";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // --- Init ---
@@ -361,7 +468,7 @@
     board = Chessboard("board", {
       draggable: true,
       position: "start",
-      pieceTheme: "/static/img/chesspieces/wikipedia/{piece}.png",
+      pieceTheme: "/img/chesspieces/wikipedia/{piece}.png",
       onDrop: onDrop,
     });
 
@@ -376,21 +483,16 @@
     const saved = localStorage.getItem("theme");
     if (saved) document.documentElement.dataset.theme = saved;
 
-    // Load game list
-    const r = await fetch("/api/games");
-    const games = await r.json();
+    // Load built-in game list (static JSON, parsed in the browser)
+    const r = await fetch("/games.json");
+    BUILTIN_GAMES = await r.json();
     const select = document.getElementById("game-select");
-    games.forEach((g) => {
-      const opt = document.createElement("option");
-      opt.value = g.id;
-      opt.textContent = g.name;
-      select.appendChild(opt);
-    });
+    populateGameSelect();
 
     // Load first game by default
-    if (games.length) {
-      await loadGame(games[0].id);
-      select.value = games[0].id;
+    if (BUILTIN_GAMES.length) {
+      loadGame(BUILTIN_GAMES[0].id);
+      select.value = BUILTIN_GAMES[0].id;
     }
 
     // Show board after first render (prevents tan flash)
@@ -398,10 +500,13 @@
 
     // --- Event listeners ---
     select.addEventListener("change", (e) => {
-      if (e.target.value === "__new") {
+      const v = e.target.value;
+      if (v === "__new") {
         loadPGN('[White "You"]\n[Black "Opponent"]\n[Result "*"]\n\n*');
-      } else if (e.target.value) {
-        loadGame(e.target.value);
+      } else if (v.startsWith("saved:")) {
+        loadSaved(v.slice(6));
+      } else if (v) {
+        loadGame(v);
       }
     });
 
@@ -475,6 +580,11 @@
     document.getElementById("export-cancel").addEventListener("click", () => exportDialog.close());
     document.getElementById("export-go").addEventListener("click", exportGif);
 
+    // Save / export PGN / delete saved game
+    document.getElementById("btn-save").addEventListener("click", saveCurrentGame);
+    document.getElementById("btn-export-pgn").addEventListener("click", exportPGN);
+    document.getElementById("btn-delete-saved").addEventListener("click", deleteSavedGame);
+
     // Keyboard shortcuts
     document.addEventListener("keydown", (e) => {
       if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
@@ -520,7 +630,7 @@
       const img = new Image();
       img.onload = () => { pieceImages[p] = img; resolve(); };
       img.onerror = () => resolve();
-      img.src = `/static/img/chesspieces/wikipedia/${p}.png`;
+      img.src = `/img/chesspieces/wikipedia/${p}.png`;
     }));
     return Promise.all(promises);
   }
@@ -612,7 +722,7 @@
       quality: 10,
       width: EXPORT_SIZE,
       height: EXPORT_SIZE,
-      workerScript: "/static/gif.worker.js",
+      workerScript: "/gif.worker.js",
     });
 
     const canvas = document.createElement("canvas");

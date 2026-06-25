@@ -1,12 +1,22 @@
-.PHONY: dev serve lint fmt build publish fly-install deploy logs status help
+.PHONY: dev serve games parity lint fmt build publish fly-install deploy logs status help
 
-# Development server with auto-reload
+# Static dev server (client-side app; refresh picks up edits)
 dev:
-	uv run uvicorn chess_pressure.app:app --host 0.0.0.0 --port 8888 --reload
+	bun run dev-server.js
 
-# Production server
+# Optional Python fallback server (also serves the static app + /api routes)
 serve:
 	uv run chess-pressure
+
+# Regenerate static/games.json from games.py (run after editing games)
+games:
+	uv run python scripts/export_games.py
+
+# Verify the JS engine matches python-chess across every built-in game
+parity:
+	cd parity && bun install --silent
+	uv run python parity/dump_python.py > parity/.py_frames.json
+	cd parity && bun run check.js
 
 # Lint
 lint: fmt
@@ -45,8 +55,10 @@ status:
 help:
 	@echo "chess-pressure"
 	@echo ""
-	@echo "  make dev     dev server with reload (:8888)"
-	@echo "  make serve   production server (:8888)"
+	@echo "  make dev     static dev server (:8888)"
+	@echo "  make serve   optional Python fallback server (:8888)"
+	@echo "  make games   regenerate static/games.json from games.py"
+	@echo "  make parity  verify JS engine matches python-chess"
 	@echo "  make lint    ruff format + check"
 	@echo "  make fmt     ruff format + auto-fix"
 	@echo "  make build   build sdist + wheel"

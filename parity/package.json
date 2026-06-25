@@ -1,0 +1,8 @@
+{
+  "name": "chess-pressure-parity",
+  "private": true,
+  "description": "Parity test: JS engine vs python-chess engine",
+  "dependencies": {
+    "chess.js": "1.4.0"
+  }
+}

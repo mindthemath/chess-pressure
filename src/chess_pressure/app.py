@@ -7,7 +7,6 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -84,16 +83,12 @@ def do_move(body: MoveRequest):
 
 
 # --- Static files ---
+# The app is fully client-side; production is served statically (see Dockerfile).
+# This Python server is kept as an optional fallback / parity reference and the
+# /api routes above remain available, but the UI no longer depends on them.
+# Mounted last so /api and /health take precedence.
 
-app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
-
-
-@app.get("/")
-def index():
-    return FileResponse(
-        str(STATIC / "index.html"),
-        headers={"Cache-Control": "no-cache, must-revalidate"},
-    )
+app.mount("/", StaticFiles(directory=str(STATIC), html=True), name="static")
 
 
 def main():

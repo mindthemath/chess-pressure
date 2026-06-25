@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/static/style.css?v=23">
+  <link rel="stylesheet" href="/style.css?v=24">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
 </head>
 <body>
@@ -73,7 +73,10 @@
       </div>
 
       <div class="export-row">
-        <button id="btn-export">Export GIF</button>
+        <button id="btn-save" title="Save this game to your browser">Save</button>
+        <button id="btn-export-pgn" title="Download this game as a PGN file">Export PGN</button>
+        <button id="btn-export" title="Export an animated GIF">Export GIF</button>
+        <button id="btn-delete-saved" class="danger" title="Delete this saved game" style="display:none">Delete</button>
       </div>
 
       <div class="status-bar" id="status-bar"></div>
@@ -122,8 +125,9 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="/static/gif.js"></script>
-  <script src="/static/app.js?v=23"></script>
+  <script src="/chess.min.js"></script>
+  <script src="/gif.js"></script>
+  <script src="/engine.js"></script>
+  <script src="/app.js?v=24"></script>
 </body>
 </html>

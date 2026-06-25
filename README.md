@@ -14,7 +14,23 @@ For each square on the board, pressure is the net number of pieces attacking it.
 - Step through famous built-in games move by move and watch the pressure heatmap evolve.
 - Upload your own PGN to analyze any game.
 - Make moves from any position and see legal moves + pressure updates in real time.
-- FastAPI backend with a lightweight static frontend.
+- Save games to your browser and re-load them later; export any game as a PGN file.
+- **Fully client-side gameplay** — legal moves, move application, and pressure are all
+  computed in the browser (via [chess.js](https://github.com/jhlywa/chess.js)), so the
+  app keeps working instantly even when the server is asleep or offline. Production is
+  served as plain static files (no backend in the request path).
+
+## Architecture
+
+The chess logic exists in two equivalent implementations:
+
+- `engine.py` (python-chess) — the original engine; also the parity reference.
+- `static/engine.js` (chess.js) — a line-for-line port that runs in the browser.
+
+`make parity` verifies the two produce **identical** output (pressure maps, FENs,
+board status, and SAN/UCI) across every built-in game, so the client engine can be
+trusted as a drop-in. Production deploys only the static assets; the FastAPI server
+(`app.py`, with the `/api` routes below) is kept as an optional local fallback.
 
 ## Built-in Games
 
@@ -34,12 +50,28 @@ For each square on the board, pressure is the net number of pieces attacking it.
 ## Quickstart
 
 ```bash
-uv run chess-pressure
+make dev        # static dev server on http://localhost:8888 (bun)
 ```
 
-The app starts on [http://localhost:8888](http://localhost:8888).
+Other useful targets:
 
-## API
+```bash
+make serve      # optional Python fallback server (also serves the static app)
+make games      # regenerate static/games.json after editing games.py
+make parity     # verify the JS engine matches python-chess
+make deploy     # deploy the static image to Fly.io
+```
+
+## Deployment
+
+Production is a ~9 MB image built on
+[static-web-server](https://static-web-server.net/) (see `Dockerfile`) — it serves
+`static/` and nothing else, so it boots fast and scales to zero cleanly. The only
+cold-start cost is the initial page load; all gameplay afterwards is local.
+
+## API (optional Python server)
+
+The static app does not use these, but `app.py` still exposes them:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -54,10 +86,17 @@ The app starts on [http://localhost:8888](http://localhost:8888).
 ```
 src/chess_pressure/
   __init__.py
-  app.py       # FastAPI routes and static file serving
-  engine.py    # Pressure computation, PGN parsing, move logic
-  games.py     # Built-in famous games (PGN data)
-  static/      # Frontend assets (HTML, JS, CSS, piece images)
+  app.py            # Optional FastAPI server (/api routes + static fallback)
+  engine.py         # Pressure computation, PGN parsing, move logic (parity reference)
+  games.py          # Built-in famous games (PGN data)
+  static/
+    engine.js       # Browser port of engine.py (chess.js)
+    chess.min.js    # Vendored chess.js 1.4.0 (bundled global)
+    games.json      # Built-in games, generated from games.py
+    app.js, ...     # Frontend (HTML, JS, CSS, piece images)
+scripts/export_games.py   # games.py -> static/games.json
+parity/                   # JS-vs-python engine parity test
+dev-server.js             # bun static dev server
 ```
 
 ## License
