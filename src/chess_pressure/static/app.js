@@ -422,7 +422,17 @@
     const name = (prompt("Save game as:", defaultGameName()) || "").trim();
     if (!name) return;
     const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
-    const saved = getSavedGames();
+    let saved = getSavedGames();
+
+    // Overwrite an existing game with the same name (case-insensitive) instead of
+    // creating a duplicate; also collapses any pre-existing duplicates.
+    const key = name.toLowerCase();
+    const exists = saved.some((g) => g.name.toLowerCase() === key);
+    if (exists) {
+      if (!confirm(`A game named "${name}" already exists. Overwrite it?`)) return;
+      saved = saved.filter((g) => g.name.toLowerCase() !== key);
+    }
+
     const id = "g" + Date.now().toString(36);
     saved.push({ id, name, pgn, savedAt: new Date().toISOString() });
     setSavedGames(saved);
