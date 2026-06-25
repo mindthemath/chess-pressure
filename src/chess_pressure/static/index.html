@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/style.css?v=27">
+  <link rel="stylesheet" href="/style.css?v=29">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
   <link rel="manifest" href="/manifest.json">
 </head>
@@ -121,6 +121,31 @@
     </form>
   </dialog>
 
+  <dialog id="save-dialog">
+    <form method="dialog">
+      <h2>Save game</h2>
+      <label>Name:
+        <input type="text" id="save-name" autocomplete="off">
+      </label>
+      <p id="save-note" class="export-info" style="display:none">A saved game with this name already exists — saving will overwrite it.</p>
+      <div class="dialog-buttons">
+        <button type="button" data-ok>Save</button>
+        <button type="button" data-cancel>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog">
+    <form method="dialog">
+      <h2>Please confirm</h2>
+      <p id="confirm-msg" class="export-info"></p>
+      <div class="dialog-buttons">
+        <button type="button" data-ok>OK</button>
+        <button type="button" data-cancel>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
   <footer>
     <a href="https://github.com/mindthemath/chess-pressure">source code</a>
   </footer>
@@ -139,6 +164,6 @@
   <script src="/chess.min.js"></script>
   <script src="/gif.js"></script>
   <script src="/engine.js"></script>
-  <script src="/app.js?v=27"></script>
+  <script src="/app.js?v=29"></script>
 </body>
 </html>

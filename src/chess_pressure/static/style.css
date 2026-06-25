@@ -325,6 +325,16 @@ dialog select {
   padding: 0.3rem;
   font-size: 0.85rem;
 }
+dialog input[type="text"] {
+  width: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
 .export-info {
   font-size: 0.8rem;
   color: var(--fg2);

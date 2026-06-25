@@ -417,37 +417,95 @@
     return "My game";
   }
 
-  function saveCurrentGame() {
+  function currentSavedName() {
+    if (!currentSavedId) return null;
+    const g = getSavedGames().find((x) => x.id === currentSavedId);
+    return g ? g.name : null;
+  }
+
+  // Promise-based in-app modal. Native prompt()/confirm() are unreliable here —
+  // browsers suppress them when the page isn't the active tab — so all save/delete
+  // prompts go through a real <dialog>. Resolves to true (OK) or false (cancel/Esc).
+  function openModal(dlg) {
+    return new Promise((resolve) => {
+      const okBtn = dlg.querySelector("[data-ok]");
+      const cancelBtn = dlg.querySelector("[data-cancel]");
+      let done = false;
+      const finish = (val) => {
+        if (done) return;
+        done = true;
+        okBtn.removeEventListener("click", onOk);
+        cancelBtn.removeEventListener("click", onCancel);
+        dlg.removeEventListener("close", onClose);
+        dlg.removeEventListener("keydown", onKey);
+        if (dlg.open) dlg.close();
+        resolve(val);
+      };
+      const onOk = () => finish(true);
+      const onCancel = () => finish(false);
+      const onClose = () => finish(false);
+      const onKey = (e) => {
+        if (e.key === "Enter" && e.target !== cancelBtn) {
+          e.preventDefault();
+          finish(true);
+        }
+      };
+      okBtn.addEventListener("click", onOk);
+      cancelBtn.addEventListener("click", onCancel);
+      dlg.addEventListener("close", onClose);
+      dlg.addEventListener("keydown", onKey);
+      dlg.showModal();
+    });
+  }
+
+  async function saveCurrentGame() {
     if (!gameData) return;
-    const name = (prompt("Save game as:", defaultGameName()) || "").trim();
+    const dlg = document.getElementById("save-dialog");
+    const input = document.getElementById("save-name");
+    const note = document.getElementById("save-note");
+    input.value = currentSavedName() || defaultGameName();
+
+    // Live "this overwrites" warning, so clicking Save IS the confirmation.
+    const refreshNote = () => {
+      const key = input.value.trim().toLowerCase();
+      const exists = key && getSavedGames().some((g) => g.name.toLowerCase() === key);
+      note.style.display = exists ? "block" : "none";
+    };
+    input.addEventListener("input", refreshNote);
+    refreshNote();
+    setTimeout(() => { input.focus(); input.select(); }, 0);
+
+    const ok = await openModal(dlg);
+    input.removeEventListener("input", refreshNote);
+    if (!ok) return;
+
+    const name = input.value.trim();
     if (!name) return;
-    const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
-    let saved = getSavedGames();
 
-    // Overwrite an existing game with the same name (case-insensitive) instead of
-    // creating a duplicate; also collapses any pre-existing duplicates.
+    // Replace any same-named game (case-insensitive); also collapses old duplicates.
     const key = name.toLowerCase();
-    const exists = saved.some((g) => g.name.toLowerCase() === key);
-    if (exists) {
-      if (!confirm(`A game named "${name}" already exists. Overwrite it?`)) return;
-      saved = saved.filter((g) => g.name.toLowerCase() !== key);
-    }
-
+    const saved = getSavedGames().filter((g) => g.name.toLowerCase() !== key);
     const id = "g" + Date.now().toString(36);
-    saved.push({ id, name, pgn, savedAt: new Date().toISOString() });
+    saved.push({
+      id,
+      name,
+      pgn: ChessPressure.toPgn(gameData.headers, gameData.moves),
+      savedAt: new Date().toISOString(),
+    });
     setSavedGames(saved);
     currentSavedId = id;
     populateGameSelect();
     updateSavedControls();
   }
 
-  function deleteSavedGame() {
+  async function deleteSavedGame() {
     if (!currentSavedId) return;
-    const saved = getSavedGames();
-    const g = saved.find((x) => x.id === currentSavedId);
+    const g = getSavedGames().find((x) => x.id === currentSavedId);
     if (!g) return;
-    if (!confirm(`Delete saved game "${g.name}"?`)) return;
-    setSavedGames(saved.filter((x) => x.id !== currentSavedId));
+    document.getElementById("confirm-msg").textContent = `Delete saved game "${g.name}"?`;
+    const ok = await openModal(document.getElementById("confirm-dialog"));
+    if (!ok) return;
+    setSavedGames(getSavedGames().filter((x) => x.id !== currentSavedId));
     currentSavedId = null;
     populateGameSelect();
     updateSavedControls();
