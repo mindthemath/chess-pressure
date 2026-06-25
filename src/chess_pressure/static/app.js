@@ -10,8 +10,8 @@
   let playTimer = null;
   let pressureMode = "equal"; // "equal" or "weighted"
   let board = null;
-  let forkPoint = null;      // index where fork happened, null if on original line
-  let originalData = null;   // saved original game before fork
+  let hasReference = false;  // true for loaded games (built-in/upload/saved) that can be reset
+  let originalData = null;   // pristine copy of a reference game, captured on first edit
   let showPieces = true;
   let showBoard = false;
   let selectedSquare = null;  // tap-to-move: currently selected source square
@@ -144,10 +144,11 @@
     } catch (e) {
       return; // illegal move — ignore
     }
-    // First divergence from the originally-loaded line: snapshot it so "Reset to original" works.
-    if (forkPoint === null && currentIndex < gameData.frames.length - 1) {
+    // For reference games (built-in/upload/saved), snapshot the pristine line the
+    // first time the user diverges from it, so "Reset to original" works. New games
+    // have no reference — corrections just overwrite, with no fork UI.
+    if (hasReference && originalData === null && currentIndex < gameData.frames.length - 1) {
       originalData = JSON.parse(JSON.stringify(gameData));
-      forkPoint = currentIndex;
     }
     // Always overwrite any continuation past the current point, so rewinding and
     // playing a different move replaces the old line instead of appending to it.
@@ -173,13 +174,11 @@
       const b = gameData.moves[i + 1];
       const wClass = currentIndex === i + 1 ? "active" : "";
       const bClass = b && currentIndex === i + 2 ? "active" : "";
-      const wForked = forkPoint !== null && i >= forkPoint ? " forked" : "";
-      const bForked = forkPoint !== null && i + 1 >= forkPoint ? " forked" : "";
       html += `<div class="move-row">`;
       html += `<span class="move-num">${num}.</span>`;
-      html += `<span class="move${wClass ? " " + wClass : ""}${wForked}" data-idx="${i + 1}">${w.san}</span>`;
+      html += `<span class="move${wClass ? " " + wClass : ""}" data-idx="${i + 1}">${w.san}</span>`;
       if (b) {
-        html += `<span class="move${bClass ? " " + bClass : ""}${bForked}" data-idx="${i + 2}">${b.san}</span>`;
+        html += `<span class="move${bClass ? " " + bClass : ""}" data-idx="${i + 2}">${b.san}</span>`;
       }
       html += `</div>`;
     }
@@ -294,20 +293,13 @@
   }
 
   function updateForkUI() {
-    const el = document.getElementById("fork-controls");
-    if (forkPoint !== null) {
-      el.style.display = "flex";
-      document.getElementById("fork-point").textContent = Math.floor(forkPoint / 2) + 1;
-    } else {
-      el.style.display = "none";
-    }
+    document.getElementById("fork-controls").style.display = originalData ? "flex" : "none";
   }
 
   function resetFork() {
     if (!originalData) return;
     gameData = originalData;
-    originalData = null;
-    forkPoint = null;
+    originalData = null; // back on the pristine reference; still resettable after future edits
     goTo(0);
     updateForkUI();
   }
@@ -329,9 +321,9 @@
     localStorage.setItem(SAVED_KEY, JSON.stringify(list));
   }
 
-  function applyParsed(parsed, savedId) {
+  function applyParsed(parsed, savedId, isReference) {
     gameData = parsed;
-    forkPoint = null;
+    hasReference = !!isReference;
     originalData = null;
     currentSavedId = savedId || null;
     currentIndex = 0;
@@ -345,7 +337,7 @@
   function loadGame(gameId) {
     const g = BUILTIN_GAMES.find((x) => x.id === gameId);
     if (!g) return;
-    applyParsed(ChessPressure.parsePgn(g.pgn), null);
+    applyParsed(ChessPressure.parsePgn(g.pgn), null, true);
   }
 
   function loadSaved(savedId) {
@@ -358,10 +350,12 @@
       alert("That saved game could not be loaded (corrupted PGN).");
       return;
     }
-    applyParsed(parsed, savedId);
+    applyParsed(parsed, savedId, true);
   }
 
-  function loadPGN(pgn) {
+  // isReference defaults true (uploaded games are resettable); new games pass false.
+  function loadPGN(pgn, isReference) {
+    if (isReference === undefined) isReference = true;
     let parsed;
     try {
       parsed = ChessPressure.parsePgn(pgn);
@@ -369,7 +363,7 @@
       alert("Could not parse PGN — please check the format and try again.");
       return;
     }
-    applyParsed(parsed, null);
+    applyParsed(parsed, null, isReference);
     document.getElementById("game-select").value = "";
   }
 
@@ -494,7 +488,7 @@
     populateGameSelect();
 
     // Start on a fresh game so the player can begin immediately.
-    loadPGN(NEW_GAME_PGN);
+    loadPGN(NEW_GAME_PGN, false);
     select.value = "__new";
 
     // Show board after first render (prevents tan flash)
@@ -504,7 +498,7 @@
     select.addEventListener("change", (e) => {
       const v = e.target.value;
       if (v === "__new") {
-        loadPGN(NEW_GAME_PGN);
+        loadPGN(NEW_GAME_PGN, false);
       } else if (v.startsWith("saved:")) {
         loadSaved(v.slice(6));
       } else if (v) {

@@ -278,7 +278,6 @@ main {
 }
 .move:hover { background: var(--move-bg); }
 .move.active { background: var(--move-active); font-weight: 600; }
-.move.forked { border-left: 2px solid var(--fork-color); }
 
 /* --- Fork controls --- */
 .fork-controls {
