@@ -18,6 +18,7 @@
   let legalMoves = [];        // legal moves from selected square
 
   const PLAY_SPEED = 800;    // ms between auto-advance
+  const NEW_GAME_PGN = '[White "You"]\n[Black "Opponent"]\n[Result "*"]\n\n*';
 
   // --- Pressure colors ---
   function pressureColor(value, maxAbs) {
@@ -241,10 +242,13 @@
       return;
     }
     const h = gameData.headers;
+    // chess.js fills the Seven Tag Roster with "?" / "????.??.??" placeholders;
+    // skip those so a fresh game just reads "You vs Opponent".
+    const real = (v) => v && v !== "?" && v !== "????.??.??";
     const parts = [];
-    if (h.White) parts.push(`${h.White} vs ${h.Black || "?"}`);
-    if (h.Event) parts.push(h.Event);
-    if (h.Date) parts.push(h.Date);
+    if (real(h.White) || real(h.Black)) parts.push(`${h.White || "?"} vs ${h.Black || "?"}`);
+    if (real(h.Event)) parts.push(h.Event);
+    if (real(h.Date)) parts.push(h.Date);
     el.textContent = parts.join(" — ");
   }
 
@@ -489,11 +493,9 @@
     const select = document.getElementById("game-select");
     populateGameSelect();
 
-    // Load first game by default
-    if (BUILTIN_GAMES.length) {
-      loadGame(BUILTIN_GAMES[0].id);
-      select.value = BUILTIN_GAMES[0].id;
-    }
+    // Start on a fresh game so the player can begin immediately.
+    loadPGN(NEW_GAME_PGN);
+    select.value = "__new";
 
     // Show board after first render (prevents tan flash)
     document.getElementById("board").classList.add("ready");
@@ -502,7 +504,7 @@
     select.addEventListener("change", (e) => {
       const v = e.target.value;
       if (v === "__new") {
-        loadPGN('[White "You"]\n[Black "Opponent"]\n[Result "*"]\n\n*');
+        loadPGN(NEW_GAME_PGN);
       } else if (v.startsWith("saved:")) {
         loadSaved(v.slice(6));
       } else if (v) {

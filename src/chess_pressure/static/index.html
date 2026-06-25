@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/style.css?v=24">
+  <link rel="stylesheet" href="/style.css?v=25">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
 </head>
 <body>
@@ -63,7 +63,10 @@
         <button id="btn-upload" title="Upload PGN">PGN</button>
       </div>
 
-      <div class="game-info" id="game-info"></div>
+      <div class="game-meta">
+        <span class="game-info" id="game-info"></span>
+        <span class="status-bar" id="status-bar"></span>
+      </div>
 
       <div class="move-list" id="move-list"></div>
 
@@ -78,8 +81,6 @@
         <button id="btn-export" title="Export an animated GIF">Export GIF</button>
         <button id="btn-delete-saved" class="danger" title="Delete this saved game" style="display:none">Delete</button>
       </div>
-
-      <div class="status-bar" id="status-bar"></div>
     </div>
   </main>
 
@@ -128,6 +129,6 @@
   <script src="/chess.min.js"></script>
   <script src="/gif.js"></script>
   <script src="/engine.js"></script>
-  <script src="/app.js?v=24"></script>
+  <script src="/app.js?v=25"></script>
 </body>
 </html>
