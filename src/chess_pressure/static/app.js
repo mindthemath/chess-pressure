@@ -347,7 +347,7 @@
     try {
       parsed = ChessPressure.parsePgn(g.pgn);
     } catch (e) {
-      alert("That saved game could not be loaded (corrupted PGN).");
+      modalAlert("That saved game could not be loaded (corrupted PGN).", "Couldn't load game");
       return;
     }
     applyParsed(parsed, savedId, true);
@@ -360,7 +360,7 @@
     try {
       parsed = ChessPressure.parsePgn(pgn);
     } catch (e) {
-      alert("Could not parse PGN — please check the format and try again.");
+      modalAlert("Could not parse PGN — please check the format and try again.", "Couldn't parse PGN");
       return;
     }
     applyParsed(parsed, null, isReference);
@@ -458,6 +458,28 @@
     });
   }
 
+  // Yes/no confirmation via the in-app dialog. Resolves true (OK) / false (cancel).
+  function modalConfirm(message, title) {
+    const dlg = document.getElementById("confirm-dialog");
+    document.getElementById("confirm-title").textContent = title || "Please confirm";
+    document.getElementById("confirm-msg").textContent = message;
+    dlg.querySelector("[data-cancel]").style.display = "";
+    return openModal(dlg);
+  }
+
+  // Single-button notice via the in-app dialog (replaces native alert()).
+  function modalAlert(message, title) {
+    const dlg = document.getElementById("confirm-dialog");
+    document.getElementById("confirm-title").textContent = title || "Notice";
+    document.getElementById("confirm-msg").textContent = message;
+    const cancel = dlg.querySelector("[data-cancel]");
+    cancel.style.display = "none";
+    return openModal(dlg).then((v) => {
+      cancel.style.display = "";
+      return v;
+    });
+  }
+
   async function saveCurrentGame() {
     if (!gameData) return;
     const dlg = document.getElementById("save-dialog");
@@ -502,8 +524,7 @@
     if (!currentSavedId) return;
     const g = getSavedGames().find((x) => x.id === currentSavedId);
     if (!g) return;
-    document.getElementById("confirm-msg").textContent = `Delete saved game "${g.name}"?`;
-    const ok = await openModal(document.getElementById("confirm-dialog"));
+    const ok = await modalConfirm(`Delete saved game "${g.name}"?`, "Delete game");
     if (!ok) return;
     setSavedGames(getSavedGames().filter((x) => x.id !== currentSavedId));
     currentSavedId = null;
