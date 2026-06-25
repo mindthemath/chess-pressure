@@ -12,7 +12,6 @@
   let board = null;
   let forkPoint = null;      // index where fork happened, null if on original line
   let originalData = null;   // saved original game before fork
-  let forkedMoves = [];      // UCI moves made after fork point
   let showPieces = true;
   let showBoard = false;
   let selectedSquare = null;  // tap-to-move: currently selected source square
@@ -157,16 +156,17 @@
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!data) return;
+        // First divergence from the originally-loaded line: snapshot it so "Reset to original" works.
         if (forkPoint === null && currentIndex < gameData.frames.length - 1) {
           originalData = JSON.parse(JSON.stringify(gameData));
           forkPoint = currentIndex;
-          gameData.moves = gameData.moves.slice(0, currentIndex);
-          gameData.frames = gameData.frames.slice(0, currentIndex + 1);
-          forkedMoves = [];
         }
+        // Always overwrite any continuation past the current point, so rewinding and
+        // playing a different move replaces the old line instead of appending to it.
+        gameData.moves = gameData.moves.slice(0, currentIndex);
+        gameData.frames = gameData.frames.slice(0, currentIndex + 1);
         gameData.moves.push({ san: data.san, uci: data.uci, ply: currentIndex + 1 });
         gameData.frames.push(data.frame);
-        if (forkPoint !== null) forkedMoves.push(data.uci);
         goTo(gameData.frames.length - 1);
         updateForkUI();
       });
@@ -318,7 +318,6 @@
     gameData = originalData;
     originalData = null;
     forkPoint = null;
-    forkedMoves = [];
     goTo(0);
     updateForkUI();
   }
@@ -330,7 +329,6 @@
     gameData = await r.json();
     forkPoint = null;
     originalData = null;
-    forkedMoves = [];
     currentIndex = 0;
     goTo(0);
     updateGameInfo();
@@ -350,7 +348,6 @@
     gameData = await r.json();
     forkPoint = null;
     originalData = null;
-    forkedMoves = [];
     currentIndex = 0;
     goTo(0);
     updateGameInfo();
