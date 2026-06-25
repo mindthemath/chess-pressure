@@ -532,8 +532,26 @@
     updateSavedControls();
   }
 
-  function exportPGN() {
+  async function exportPGN() {
     if (!gameData) return;
+
+    // Let the user set player names before download; pre-fill from headers,
+    // treating placeholders ("?") as blank. Names are written back so they show
+    // on screen and persist on Save too.
+    const whiteEl = document.getElementById("pgn-white");
+    const blackEl = document.getElementById("pgn-black");
+    const real = (v) => (v && v !== "?" && v !== "????.??.??" ? v : "");
+    whiteEl.value = real(gameData.headers.White);
+    blackEl.value = real(gameData.headers.Black);
+    setTimeout(() => { whiteEl.focus(); whiteEl.select(); }, 0);
+
+    const ok = await openModal(document.getElementById("export-pgn-dialog"));
+    if (!ok) return;
+
+    gameData.headers.White = whiteEl.value.trim() || "White";
+    gameData.headers.Black = blackEl.value.trim() || "Black";
+    updateGameInfo();
+
     const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
     const slug = (defaultGameName() || "game")
       .toLowerCase()

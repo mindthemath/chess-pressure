@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/style.css?v=30">
+  <link rel="stylesheet" href="/style.css?v=31">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
   <link rel="manifest" href="/manifest.json">
 </head>
@@ -135,6 +135,18 @@
     </form>
   </dialog>
 
+  <dialog id="export-pgn-dialog">
+    <form method="dialog">
+      <h2>Export PGN</h2>
+      <label>White: <input type="text" id="pgn-white" autocomplete="off" placeholder="White player"></label>
+      <label>Black: <input type="text" id="pgn-black" autocomplete="off" placeholder="Black player"></label>
+      <div class="dialog-buttons">
+        <button type="button" data-ok>Download</button>
+        <button type="button" data-cancel>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="confirm-dialog">
     <form method="dialog">
       <h2 id="confirm-title">Please confirm</h2>
@@ -164,6 +176,6 @@
   <script src="/chess.min.js"></script>
   <script src="/gif.js"></script>
   <script src="/engine.js"></script>
-  <script src="/app.js?v=30"></script>
+  <script src="/app.js?v=31"></script>
 </body>
 </html>
