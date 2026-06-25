@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chess Pressure</title>
-  <link rel="stylesheet" href="/style.css?v=31">
+  <link rel="stylesheet" href="/style.css?v=32">
   <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
   <link rel="manifest" href="/manifest.json">
 </head>
@@ -127,6 +127,8 @@
       <label>Name:
         <input type="text" id="save-name" autocomplete="off">
       </label>
+      <label>White: <input type="text" id="save-white" autocomplete="off" placeholder="White player"></label>
+      <label>Black: <input type="text" id="save-black" autocomplete="off" placeholder="Black player"></label>
       <p id="save-note" class="export-info" style="display:none">A saved game with this name already exists — saving will overwrite it.</p>
       <div class="dialog-buttons">
         <button type="button" data-ok>Save</button>
@@ -176,6 +178,6 @@
   <script src="/chess.min.js"></script>
   <script src="/gif.js"></script>
   <script src="/engine.js"></script>
-  <script src="/app.js?v=31"></script>
+  <script src="/app.js?v=32"></script>
 </body>
 </html>

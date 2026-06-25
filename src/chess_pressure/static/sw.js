@@ -7,7 +7,7 @@
  *
  * Bump CACHE on every deploy so clients pick up new assets.
  */
-const CACHE = "chess-pressure-v31";
+const CACHE = "chess-pressure-v32";
 
 // Same-origin app shell. Cached by canonical path; the fetch handler matches
 // with ignoreSearch so cache-busting query strings (?v=NN) still hit.

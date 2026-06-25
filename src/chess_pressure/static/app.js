@@ -423,6 +423,21 @@
     return g ? g.name : null;
   }
 
+  // Player-name fields shared by the Save and Export dialogs. Pre-fill treats
+  // PGN placeholders ("?") as blank; write-back updates headers + on-screen info.
+  const cleanHeader = (v) => (v && v !== "?" && v !== "????.??.??" ? v : "");
+
+  function prefillPlayerInputs(whiteEl, blackEl) {
+    whiteEl.value = cleanHeader(gameData.headers.White);
+    blackEl.value = cleanHeader(gameData.headers.Black);
+  }
+
+  function applyPlayerInputs(whiteEl, blackEl) {
+    gameData.headers.White = whiteEl.value.trim() || "White";
+    gameData.headers.Black = blackEl.value.trim() || "Black";
+    updateGameInfo();
+  }
+
   // Promise-based in-app modal. Native prompt()/confirm() are unreliable here —
   // browsers suppress them when the page isn't the active tab — so all save/delete
   // prompts go through a real <dialog>. Resolves to true (OK) or false (cancel/Esc).
@@ -485,7 +500,10 @@
     const dlg = document.getElementById("save-dialog");
     const input = document.getElementById("save-name");
     const note = document.getElementById("save-note");
+    const whiteEl = document.getElementById("save-white");
+    const blackEl = document.getElementById("save-black");
     input.value = currentSavedName() || defaultGameName();
+    prefillPlayerInputs(whiteEl, blackEl);
 
     // Live "this overwrites" warning, so clicking Save IS the confirmation.
     const refreshNote = () => {
@@ -503,6 +521,8 @@
 
     const name = input.value.trim();
     if (!name) return;
+
+    applyPlayerInputs(whiteEl, blackEl);
 
     // Replace any same-named game (case-insensitive); also collapses old duplicates.
     const key = name.toLowerCase();
@@ -535,22 +555,16 @@
   async function exportPGN() {
     if (!gameData) return;
 
-    // Let the user set player names before download; pre-fill from headers,
-    // treating placeholders ("?") as blank. Names are written back so they show
-    // on screen and persist on Save too.
+    // Let the user set player names before download (shared with the Save dialog).
     const whiteEl = document.getElementById("pgn-white");
     const blackEl = document.getElementById("pgn-black");
-    const real = (v) => (v && v !== "?" && v !== "????.??.??" ? v : "");
-    whiteEl.value = real(gameData.headers.White);
-    blackEl.value = real(gameData.headers.Black);
+    prefillPlayerInputs(whiteEl, blackEl);
     setTimeout(() => { whiteEl.focus(); whiteEl.select(); }, 0);
 
     const ok = await openModal(document.getElementById("export-pgn-dialog"));
     if (!ok) return;
 
-    gameData.headers.White = whiteEl.value.trim() || "White";
-    gameData.headers.Black = blackEl.value.trim() || "Black";
-    updateGameInfo();
+    applyPlayerInputs(whiteEl, blackEl);
 
     const pgn = ChessPressure.toPgn(gameData.headers, gameData.moves);
     const slug = (defaultGameName() || "game")
